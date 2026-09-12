@@ -231,12 +231,6 @@ export const DashboardPortal = () => {
           </div>
 
           <div className="flex items-center gap-2">
-            <span className="text-[10px] font-mono px-2 py-0.5 rounded bg-blue-50 border border-blue-200 text-blue-700 font-semibold">
-              SAT-COM 14.2 GHz
-            </span>
-            <span className="text-[10px] font-mono px-2 py-0.5 rounded bg-slate-100 border border-slate-200 text-slate-600">
-              Node: IN-MAA-01
-            </span>
             {incidents.length > 0 && (
               <button
                 onClick={() => {
