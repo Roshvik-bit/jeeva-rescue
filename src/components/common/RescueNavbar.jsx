@@ -36,20 +36,24 @@ export const RescueNavbar = () => {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 h-16 flex items-center justify-between gap-3">
         {/* Brand: JEEVA | Rescue Command */}
         <div className="flex items-center gap-3">
-          <div className="flex items-center gap-2.5 text-left">
-            <div className="w-9 h-9 rounded-xl bg-slate-900 border border-slate-800 flex items-center justify-center shadow-xs overflow-hidden p-0.5">
-              <img src="/logo-white.png" alt="JEEVA Command" className="w-full h-full object-contain" />
+          <div className="flex items-center gap-3 text-left">
+            <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-slate-950 via-slate-900 to-slate-800 border border-slate-700/60 flex items-center justify-center shadow-sm shrink-0 p-2">
+              <img 
+                src="/jeeva-emblem-white.png" 
+                alt="JEEVA Emblem" 
+                className="w-full h-full object-contain drop-shadow-xs" 
+              />
             </div>
-            <div className="flex flex-col">
+            <div className="flex flex-col justify-center">
               <div className="flex items-center gap-2">
-                <span className="font-extrabold text-base tracking-tight text-slate-900 leading-none">
+                <span className="font-black text-lg tracking-tight text-slate-900 leading-none">
                   {t.appName || "JEEVA"}
                 </span>
-                <span className="px-2 py-0.5 rounded-full text-[10px] font-bold bg-amber-100 text-amber-900 border border-amber-200 uppercase tracking-wider">
+                <span className="px-2 py-0.5 rounded-md text-[10px] font-bold bg-amber-50 text-amber-800 border border-amber-300/80 uppercase tracking-wider shadow-2xs">
                   Rescue Command
                 </span>
               </div>
-              <span className="text-[11px] text-slate-500 font-medium hidden sm:inline mt-0.5">
+              <span className="text-[11px] text-slate-500 font-medium hidden sm:inline mt-0.5 tracking-tight">
                 Disaster Incident Management & Fleet Dispatch System
               </span>
             </div>
