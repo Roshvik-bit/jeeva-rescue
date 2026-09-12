@@ -6,12 +6,14 @@ import { FilterSortControls } from "./FilterSortControls";
 import { PriorityIncidentList } from "./PriorityIncidentList";
 import { IncidentDetailModal } from "./IncidentDetailModal";
 import { DispatchUnitModal } from "./DispatchUnitModal";
+import { RescueDepartmentsDirectory } from "./RescueDepartmentsDirectory";
 import {
   LayoutDashboard,
   ShieldAlert,
   Map as MapIcon,
   Bell,
   Truck,
+  Building2,
   Activity,
   Radio,
   Clock,
@@ -24,7 +26,7 @@ import {
 } from "lucide-react";
 
 export const DashboardPortal = () => {
-  const { incidents, rescueUnits, isOnline, clearAllIncidents, t } = useRescueEmergency();
+  const { incidents, rescueUnits, rescueDepartments = [], isOnline, clearAllIncidents, t } = useRescueEmergency();
 
   const [selectedIncident, setSelectedIncident] = useState(null);
   const [dispatchTargetIncident, setDispatchTargetIncident] = useState(null);
@@ -117,7 +119,7 @@ export const DashboardPortal = () => {
     { id: "incidents", label: t.incidents || "Incidents", icon: <ShieldAlert className="w-4 h-4" />, count: incidents.filter(i => i.status !== "Resolved").length },
     { id: "map", label: t.map || "Map", icon: <MapIcon className="w-4 h-4" /> },
     { id: "alerts", label: t.alerts || "Alerts", icon: <Bell className="w-4 h-4" />, count: incidents.filter(i => (i.severity === "Critical" || i.priorityScore >= 8.5) && i.status !== "Resolved").length, alertBadge: true },
-    { id: "resources", label: t.resources || "Resources", icon: <Truck className="w-4 h-4" />, count: `${rescueUnits.filter(u => u.status === "Available").length}/${rescueUnits.length}` },
+    { id: "resources", label: "Rescue Bases", icon: <Building2 className="w-4 h-4" />, count: `${rescueDepartments.length}` },
     { id: "status", label: t.systemStatus || "System Status", icon: <Activity className="w-4 h-4" /> }
   ];
 
@@ -252,111 +254,122 @@ export const DashboardPortal = () => {
           </div>
         </div>
 
-        {/* Top Command Analytics & 4 Bento KPI Cards */}
-        <CommandAnalyticsBar />
+        {activeSidebarTab === "resources" ? (
+          <RescueDepartmentsDirectory
+            onFocusDepartmentOnMap={(dept) => {
+              setActiveSidebarTab("dashboard");
+              setMobileView("map");
+            }}
+          />
+        ) : (
+          <>
+            {/* Top Command Analytics & 4 Bento KPI Cards */}
+            <CommandAnalyticsBar />
 
-        {/* Mobile View Segmented Control (Hidden on lg screens) */}
-        <div className="lg:hidden flex bg-slate-100 p-1 rounded-xl border border-slate-200">
-          <button
-            onClick={() => setMobileView("split")}
-            className={`flex-1 py-1.5 rounded-lg text-xs font-bold transition-all ${
-              mobileView === "split" ? "bg-white text-blue-700 shadow-sm" : "text-slate-600"
-            }`}
-          >
-            Combined View
-          </button>
-          <button
-            onClick={() => setMobileView("map")}
-            className={`flex-1 py-1.5 rounded-lg text-xs font-bold transition-all flex items-center justify-center gap-1 ${
-              mobileView === "map" ? "bg-white text-blue-700 shadow-sm" : "text-slate-600"
-            }`}
-          >
-            <MapIcon className="w-3.5 h-3.5" />
-            <span>Map View</span>
-          </button>
-          <button
-            onClick={() => setMobileView("list")}
-            className={`flex-1 py-1.5 rounded-lg text-xs font-bold transition-all flex items-center justify-center gap-1 ${
-              mobileView === "list" ? "bg-white text-blue-700 shadow-sm" : "text-slate-600"
-            }`}
-          >
-            <ShieldAlert className="w-3.5 h-3.5" />
-            <span>Incident Queue ({filteredIncidents.length})</span>
-          </button>
-        </div>
-
-        {/* Main Grid: Left Map + Right Incident Feed */}
-        <div className="grid grid-cols-1 lg:grid-cols-12 gap-5 items-start">
-          {/* Left Col: Live Interactive Leaflet Map */}
-          <div
-            className={`lg:col-span-6 xl:col-span-7 space-y-3 ${
-              mobileView === "list" ? "hidden lg:block" : "block"
-            }`}
-          >
-            <div className="flex items-center justify-between">
-              <h3 className="text-xs font-bold uppercase tracking-wider text-slate-700 flex items-center gap-1.5">
-                <MapIcon className="w-4 h-4 text-blue-600" />
-                <span>{t.liveOperationsMap || "Live Disaster Operations Map"}</span>
-              </h3>
-              <span className="text-[11px] font-medium text-slate-600 flex items-center gap-1.5">
-                <span className="w-2 h-2 rounded-full bg-green-600"></span>
-                {t.openStreetMapActive || "OpenStreetMap Active"}
-              </span>
+            {/* Mobile View Segmented Control (Hidden on lg screens) */}
+            <div className="lg:hidden flex bg-slate-100 p-1 rounded-xl border border-slate-200">
+              <button
+                onClick={() => setMobileView("split")}
+                className={`flex-1 py-1.5 rounded-lg text-xs font-bold transition-all ${
+                  mobileView === "split" ? "bg-white text-blue-700 shadow-sm" : "text-slate-600"
+                }`}
+              >
+                Combined View
+              </button>
+              <button
+                onClick={() => setMobileView("map")}
+                className={`flex-1 py-1.5 rounded-lg text-xs font-bold transition-all flex items-center justify-center gap-1 ${
+                  mobileView === "map" ? "bg-white text-blue-700 shadow-sm" : "text-slate-600"
+                }`}
+              >
+                <MapIcon className="w-3.5 h-3.5" />
+                <span>Map View</span>
+              </button>
+              <button
+                onClick={() => setMobileView("list")}
+                className={`flex-1 py-1.5 rounded-lg text-xs font-bold transition-all flex items-center justify-center gap-1 ${
+                  mobileView === "list" ? "bg-white text-blue-700 shadow-sm" : "text-slate-600"
+                }`}
+              >
+                <ShieldAlert className="w-3.5 h-3.5" />
+                <span>Incident Queue ({filteredIncidents.length})</span>
+              </button>
             </div>
 
-            <IncidentMapView
-              onSelectIncident={(inc) => setSelectedIncident(inc)}
-              selectedIncidentId={selectedIncident?.id}
-              onQuickDispatch={(inc) => setDispatchTargetIncident(inc)}
-            />
-          </div>
+            {/* Main Grid: Left Map + Right Incident Feed */}
+            <div className="grid grid-cols-1 lg:grid-cols-12 gap-5 items-start">
+              {/* Left Col: Live Interactive Leaflet Map */}
+              <div
+                className={`lg:col-span-6 xl:col-span-7 space-y-3 ${
+                  mobileView === "list" ? "hidden lg:block" : "block"
+                }`}
+              >
+                <div className="flex items-center justify-between">
+                  <h3 className="text-xs font-bold uppercase tracking-wider text-slate-700 flex items-center gap-1.5">
+                    <MapIcon className="w-4 h-4 text-blue-600" />
+                    <span>{t.liveOperationsMap || "Live Disaster Operations Map"}</span>
+                  </h3>
+                  <span className="text-[11px] font-medium text-slate-600 flex items-center gap-1.5">
+                    <span className="w-2 h-2 rounded-full bg-green-600"></span>
+                    {t.openStreetMapActive || "OpenStreetMap Active"}
+                  </span>
+                </div>
 
-          {/* Right Col: Filters & Priority Incident Feed */}
-          <div
-            className={`lg:col-span-6 xl:col-span-5 space-y-3.5 ${
-              mobileView === "map" ? "hidden lg:block" : "block"
-            }`}
-          >
-            {/* Filter & Sort Controls */}
-            <FilterSortControls
-              searchQuery={searchQuery}
-              setSearchQuery={setSearchQuery}
-              selectedCategory={selectedCategory}
-              setSelectedCategory={setSelectedCategory}
-              selectedSeverity={selectedSeverity}
-              setSelectedSeverity={setSelectedSeverity}
-              selectedStatus={selectedStatus}
-              setSelectedStatus={setSelectedStatus}
-              sortBy={sortBy}
-              setSortBy={setSortBy}
-            />
+                <IncidentMapView
+                  onSelectIncident={(inc) => setSelectedIncident(inc)}
+                  selectedIncidentId={selectedIncident?.id}
+                  onQuickDispatch={(inc) => setDispatchTargetIncident(inc)}
+                />
+              </div>
 
-            {/* Results Counter Header */}
-            <div className="flex items-center justify-between text-xs text-slate-600 px-1">
-              <span className="font-semibold text-slate-800">
-                {t.rankedQueue || "Ranked Incident Queue"} ({filteredIncidents.length})
-              </span>
-              <span className="text-[11px] font-mono text-slate-500">
-                Sort:{" "}
-                {sortBy === "people"
-                  ? "Victim Count"
-                  : sortBy === "recent"
-                  ? "Recency"
-                  : "Priority Score"}
-              </span>
+              {/* Right Col: Filters & Priority Incident Feed */}
+              <div
+                className={`lg:col-span-6 xl:col-span-5 space-y-3.5 ${
+                  mobileView === "map" ? "hidden lg:block" : "block"
+                }`}
+              >
+                {/* Filter & Sort Controls */}
+                <FilterSortControls
+                  searchQuery={searchQuery}
+                  setSearchQuery={setSearchQuery}
+                  selectedCategory={selectedCategory}
+                  setSelectedCategory={setSelectedCategory}
+                  selectedSeverity={selectedSeverity}
+                  setSelectedSeverity={setSelectedSeverity}
+                  selectedStatus={selectedStatus}
+                  setSelectedStatus={setSelectedStatus}
+                  sortBy={sortBy}
+                  setSortBy={setSortBy}
+                />
+
+                {/* Results Counter Header */}
+                <div className="flex items-center justify-between text-xs text-slate-600 px-1">
+                  <span className="font-semibold text-slate-800">
+                    {t.rankedQueue || "Ranked Incident Queue"} ({filteredIncidents.length})
+                  </span>
+                  <span className="text-[11px] font-mono text-slate-500">
+                    Sort:{" "}
+                    {sortBy === "people"
+                      ? "Victim Count"
+                      : sortBy === "recent"
+                      ? "Recency"
+                      : "Priority Score"}
+                  </span>
+                </div>
+
+                {/* Priority Incident Feed */}
+                <div className="max-h-[620px] overflow-y-auto pr-1 space-y-3">
+                  <PriorityIncidentList
+                    incidents={filteredIncidents}
+                    onSelectIncident={(inc) => setSelectedIncident(inc)}
+                    onOpenDispatch={(inc) => setDispatchTargetIncident(inc)}
+                    selectedIncidentId={selectedIncident?.id}
+                  />
+                </div>
+              </div>
             </div>
-
-            {/* Priority Incident Feed */}
-            <div className="max-h-[620px] overflow-y-auto pr-1 space-y-3">
-              <PriorityIncidentList
-                incidents={filteredIncidents}
-                onSelectIncident={(inc) => setSelectedIncident(inc)}
-                onOpenDispatch={(inc) => setDispatchTargetIncident(inc)}
-                selectedIncidentId={selectedIncident?.id}
-              />
-            </div>
-          </div>
-        </div>
+          </>
+        )}
       </main>
 
       {/* Incident Detail Inspector Modal */}

@@ -1,6 +1,8 @@
 import React, { createContext, useContext, useState, useEffect, useCallback, useRef } from "react";
 import {
   RESCUE_UNITS,
+  RESCUE_DEPARTMENTS,
+  REGIONAL_ZONES,
   translations,
   storageService,
   supabaseService
@@ -34,6 +36,8 @@ export const RescueProvider = ({ children }) => {
   });
 
   const [rescueUnits, setRescueUnits] = useState(RESCUE_UNITS);
+  const [rescueDepartments] = useState(RESCUE_DEPARTMENTS);
+  const [selectedRegion, setSelectedRegion] = useState("all");
 
   // Toast Notifications
   const [toasts, setToasts] = useState([]);
@@ -379,6 +383,10 @@ export const RescueProvider = ({ children }) => {
         toggleOnlineStatus,
         incidents,
         rescueUnits,
+        rescueDepartments,
+        regionalZones: REGIONAL_ZONES,
+        selectedRegion,
+        setSelectedRegion,
         toasts,
         addToast,
         removeToast,
