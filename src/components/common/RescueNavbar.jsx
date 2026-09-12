@@ -37,11 +37,11 @@ export const RescueNavbar = () => {
   const languages = [
     { code: "en", label: "English" },
     { code: "hi", label: "हिन्दी (Hindi)" },
-    { code: "kn", label: "ಕನ್ನಡ (Kannada)" },
-    { code: "bn", label: "বাংলা (Bengali)" },
-    { code: "ta", label: "தமிழ் (Tamil)" },
     { code: "te", label: "తెలుగు (Telugu)" },
+    { code: "kn", label: "ಕನ್ನಡ (Kannada)" },
+    { code: "ta", label: "தமிழ் (Tamil)" },
     { code: "ml", label: "മലയാളം (Malayalam)" },
+    { code: "bn", label: "বাংলা (Bengali)" },
     { code: "mr", label: "मराठी (Marathi)" }
   ];
 
@@ -301,7 +301,22 @@ export const RescueNavbar = () => {
             ))}
           </div>
 
-          <div className="pt-2 border-t border-slate-100 flex items-center justify-between text-xs">
+          <div className="pt-2 border-t border-slate-100 flex flex-wrap items-center justify-between gap-2 text-xs">
+            <div className="flex items-center bg-slate-50 border border-slate-200 rounded-lg px-2.5 py-1.5 text-xs text-slate-700">
+              <Globe className="w-3.5 h-3.5 text-slate-400 mr-1.5 shrink-0" />
+              <select
+                value={language}
+                onChange={(e) => setLanguage(e.target.value)}
+                className="bg-transparent text-slate-700 text-xs focus:outline-none cursor-pointer pr-1"
+              >
+                {languages.map((l) => (
+                  <option key={l.code} value={l.code}>
+                    {l.label}
+                  </option>
+                ))}
+              </select>
+            </div>
+
             <button
               onClick={() => {
                 setActiveModal("status");
