@@ -1,6 +1,7 @@
 import React from "react";
 import { RescueProvider, useRescueEmergency } from "./context/RescueContext";
 import { RescueNavbar } from "./components/common/RescueNavbar";
+import { NavbarModals } from "./components/common/NavbarModals";
 import { ToastContainer } from "./components/common/ToastContainer";
 import { ErrorBoundary } from "./components/common/ErrorBoundary";
 import { DashboardPortal } from "./components/dashboard/DashboardPortal";
@@ -13,6 +14,9 @@ const RescueAppContent = () => {
     <div className="min-h-screen flex flex-col bg-[#F7F9FC] text-[#1F2937] selection:bg-blue-600 selection:text-white">
       {/* Command Center Global Header */}
       <RescueNavbar />
+
+      {/* Global Interactive Navbar Popups & Modals */}
+      <NavbarModals />
 
       {/* Global Toast Notifications */}
       <ToastContainer />

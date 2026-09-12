@@ -26,18 +26,36 @@ import {
 } from "lucide-react";
 
 export const DashboardPortal = () => {
-  const { incidents, rescueUnits, rescueDepartments = [], isOnline, clearAllIncidents, t } = useRescueEmergency();
+  const {
+    incidents,
+    rescueUnits,
+    rescueDepartments = [],
+    isOnline,
+    clearAllIncidents,
+    t,
+    activeTab = "dashboard",
+    setActiveTab,
+    activeModal,
+    setActiveModal,
+    inspectedIncident,
+    setInspectedIncident,
+    dispatchingIncident,
+    setDispatchingIncident
+  } = useRescueEmergency();
 
   const [selectedIncident, setSelectedIncident] = useState(null);
   const [dispatchTargetIncident, setDispatchTargetIncident] = useState(null);
-  const [activeSidebarTab, setActiveSidebarTab] = useState("dashboard"); // "dashboard" | "incidents" | "map" | "alerts" | "resources" | "status"
   const [lastSyncTime, setLastSyncTime] = useState("Just now");
 
-  // Keep selected incident synchronized with live incidents state
+  // Keep selected incident synchronized with live incidents state (local or via global inspectedIncident)
+  const currentInspectorTarget = selectedIncident || inspectedIncident;
   const activeSelectedIncident = useMemo(() => {
-    if (!selectedIncident) return null;
-    return incidents.find((i) => i.id === selectedIncident.id) || selectedIncident;
-  }, [incidents, selectedIncident]);
+    if (!currentInspectorTarget) return null;
+    return incidents.find((i) => i.id === currentInspectorTarget.id) || currentInspectorTarget;
+  }, [incidents, currentInspectorTarget]);
+
+  // Keep dispatch target synchronized (local or via global dispatchingIncident)
+  const currentDispatchTarget = dispatchTargetIncident || dispatchingIncident;
 
   // Filters & Sorting state
   const [searchQuery, setSearchQuery] = useState("");
@@ -59,6 +77,17 @@ export const DashboardPortal = () => {
     }, 15000);
     return () => clearInterval(interval);
   }, []);
+
+  // Synchronize mobile view when activeTab changes (e.g. from top navbar)
+  useEffect(() => {
+    if (activeTab === "map") {
+      setMobileView("map");
+    } else if (activeTab === "incidents" || activeTab === "alerts") {
+      setMobileView("list");
+    } else if (activeTab === "dashboard") {
+      setMobileView("split");
+    }
+  }, [activeTab]);
 
   // Filtered & Sorted Incidents
   const filteredIncidents = useMemo(() => {
@@ -90,7 +119,7 @@ export const DashboardPortal = () => {
         }
 
         // Alerts tab filter (only Critical/High)
-        if (activeSidebarTab === "alerts") {
+        if (activeTab === "alerts") {
           if (inc.severity !== "Critical" && inc.severity !== "High") return false;
         }
 
@@ -111,7 +140,7 @@ export const DashboardPortal = () => {
         // Default: Smart Priority Score
         return (b.priorityScore || 0) - (a.priorityScore || 0);
       });
-  }, [incidents, searchQuery, selectedCategory, selectedSeverity, selectedStatus, sortBy, activeSidebarTab]);
+  }, [incidents, searchQuery, selectedCategory, selectedSeverity, selectedStatus, sortBy, activeTab]);
 
   // Sidebar navigation items
   const sidebarNavItems = [
@@ -124,11 +153,21 @@ export const DashboardPortal = () => {
   ];
 
   const handleSidebarClick = (id) => {
-    setActiveSidebarTab(id);
+    if (id === "status") {
+      setActiveModal("status");
+      return;
+    }
+    if (id === "incidents") {
+      setActiveModal("incidents");
+      return;
+    }
+    if (id === "alerts") {
+      setActiveModal("alerts");
+      return;
+    }
+    setActiveTab(id);
     if (id === "map") {
       setMobileView("map");
-    } else if (id === "incidents" || id === "alerts") {
-      setMobileView("list");
     } else {
       setMobileView("split");
     }
@@ -144,7 +183,7 @@ export const DashboardPortal = () => {
           </div>
           <nav className="mt-2 space-y-1">
             {sidebarNavItems.map((item) => {
-              const isActive = activeSidebarTab === item.id;
+              const isActive = activeTab === item.id;
               return (
                 <button
                   key={item.id}
@@ -248,10 +287,10 @@ export const DashboardPortal = () => {
           </div>
         </div>
 
-        {activeSidebarTab === "resources" ? (
+        {activeTab === "resources" ? (
           <RescueDepartmentsDirectory
             onFocusDepartmentOnMap={(dept) => {
-              setActiveSidebarTab("dashboard");
+              setActiveTab("dashboard");
               setMobileView("map");
             }}
           />
@@ -371,16 +410,24 @@ export const DashboardPortal = () => {
         <IncidentDetailModal
           incident={activeSelectedIncident}
           isOpen={Boolean(activeSelectedIncident)}
-          onClose={() => setSelectedIncident(null)}
+          onClose={() => {
+            setSelectedIncident(null);
+            setInspectedIncident(null);
+          }}
         />
       )}
 
       {/* Direct Dispatch Modal */}
-      <DispatchUnitModal
-        incident={dispatchTargetIncident}
-        isOpen={Boolean(dispatchTargetIncident)}
-        onClose={() => setDispatchTargetIncident(null)}
-      />
+      {currentDispatchTarget && (
+        <DispatchUnitModal
+          incident={currentDispatchTarget}
+          isOpen={Boolean(currentDispatchTarget)}
+          onClose={() => {
+            setDispatchTargetIncident(null);
+            setDispatchingIncident(null);
+          }}
+        />
+      )}
     </div>
   );
 };

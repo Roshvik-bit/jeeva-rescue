@@ -38,6 +38,10 @@ export const RescueProvider = ({ children }) => {
   const [rescueUnits, setRescueUnits] = useState(RESCUE_UNITS);
   const [rescueDepartments] = useState(RESCUE_DEPARTMENTS);
   const [selectedRegion, setSelectedRegion] = useState("all");
+  const [activeTab, setActiveTab] = useState("dashboard");
+  const [activeModal, setActiveModal] = useState(null);
+  const [inspectedIncident, setInspectedIncident] = useState(null);
+  const [dispatchingIncident, setDispatchingIncident] = useState(null);
 
   // Toast Notifications
   const [toasts, setToasts] = useState([]);
@@ -387,6 +391,14 @@ export const RescueProvider = ({ children }) => {
         regionalZones: REGIONAL_ZONES,
         selectedRegion,
         setSelectedRegion,
+        activeTab,
+        setActiveTab,
+        activeModal,
+        setActiveModal,
+        inspectedIncident,
+        setInspectedIncident,
+        dispatchingIncident,
+        setDispatchingIncident,
         toasts,
         addToast,
         removeToast,
