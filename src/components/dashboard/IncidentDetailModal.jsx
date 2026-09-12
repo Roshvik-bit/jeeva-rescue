@@ -1,5 +1,5 @@
 import React, { useState, useMemo, useEffect } from "react";
-import { useRescueEmergency } from "../../context/RescueContext";
+import { useRescueEmergency, useEmergency } from "../../context/RescueContext";
 import { storageService, getPlayableAudioUrl } from "@jeeva/shared";
 import { DispatchUnitModal } from "./DispatchUnitModal";
 import {
@@ -64,7 +64,7 @@ const AudioPlayerSection = React.memo(({ audioSrc, incidentId }) => {
 });
 
 export const IncidentDetailModal = ({ incident, isOpen, onClose }) => {
-  const { updateIncidentStatus, rescueUnits, t } = useEmergency();
+  const { updateIncidentStatus, rescueUnits, t } = useRescueEmergency();
   const [isDispatchModalOpen, setIsDispatchModalOpen] = useState(false);
 
   // Unconditionally execute useMemo at the top level to adhere strictly to React Hook Rules

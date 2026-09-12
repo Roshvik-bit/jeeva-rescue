@@ -2,6 +2,7 @@ import React from "react";
 import { RescueProvider, useRescueEmergency } from "./context/RescueContext";
 import { RescueNavbar } from "./components/common/RescueNavbar";
 import { ToastContainer } from "./components/common/ToastContainer";
+import { ErrorBoundary } from "./components/common/ErrorBoundary";
 import { DashboardPortal } from "./components/dashboard/DashboardPortal";
 import { ShieldAlert, Activity } from "lucide-react";
 
@@ -18,7 +19,9 @@ const RescueAppContent = () => {
 
       {/* Main Operational Workspace - Dedicated Dashboard Portal */}
       <main className="flex-1">
-        <DashboardPortal />
+        <ErrorBoundary>
+          <DashboardPortal />
+        </ErrorBoundary>
       </main>
 
       {/* Command Operations Footer */}
